@@ -50,7 +50,7 @@ void ObjCoordCB(const wpb_yolo5::BBox3D::ConstPtr &msg)
     if(bGrabbing == false)
     {
         int nNumObj = msg->name.size();
-        ROS_WARN("[ObjCoordCB] obj = %d",nNumObj);
+        ROS_WARN("[wpb_home_grab_yolo] 接收到结果数量 = %d",nNumObj);
         for(int i=0; i<nNumObj; i++)
         {
             if(msg->name[i] == "water")
@@ -59,7 +59,7 @@ void ObjCoordCB(const wpb_yolo5::BBox3D::ConstPtr &msg)
                 grab_msg.position.y = (msg->y_min[i] + msg->y_min[i])/2;
                 grab_msg.position.z = (msg->z_min[i] + msg->z_min[i])/2;
                 grab_pub.publish(grab_msg);
-                ROS_WARN("[ObjCoordCB] Start Grabbing! (%.2f , %.2f , %.2f)",grab_msg.position.x,grab_msg.position.y,grab_msg.position.z);
+                ROS_WARN("[wpb_home_grab_yolo] 抓取目标 %s (%.2f , %.2f , %.2f)",msg->name[i].c_str(),grab_msg.position.x,grab_msg.position.y,grab_msg.position.z);
                 bGrabbing = true;
             }
         }
@@ -73,6 +73,7 @@ void GrabResultCB(const std_msgs::String::ConstPtr &msg)
 
 int main(int argc, char** argv)
 {
+    setlocale(LC_ALL,"");
     ros::init(argc, argv, "wpb_home_grab_yolo");  //程序初始化
 
     ros::NodeHandle n;

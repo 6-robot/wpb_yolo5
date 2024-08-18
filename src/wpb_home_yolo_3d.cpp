@@ -99,13 +99,15 @@ void callbackColorImage(const sensor_msgs::ImageConstPtr& msg)
     //ROS_INFO("callbackColorImage");
     if(flag_predicted == false)
         return;
-
+    
+    ROS_INFO("[wpb_home_yolo_3d] 发送一帧图像给 yolo5_node");
     predict_pub.publish(msg); 
     flag_predicted = false;
 }
 
 void callbackBbox(const wpb_yolo5::BBox2D &msg)
 {
+    ROS_INFO("[wpb_home_yolo_3d] 接收到 yolo5_node 识别结果");
     objects.clear();
     int nNum = msg.name.size();
     if(nNum > 0)
@@ -121,6 +123,7 @@ void callbackBbox(const wpb_yolo5::BBox2D &msg)
             box_object.bottom = msg.bottom[i];
             box_object.probability = msg.probability[i];
             recv_objects.push_back(box_object);
+            ROS_INFO("[识别结果-%d] %s (%.2d,%.2d)",i,box_object.name.c_str(),box_object.left,box_object.top);
         }
         objects = recv_objects;
     }
@@ -349,10 +352,6 @@ void callbackPointCloud(const sensor_msgs::PointCloud2 &input)
             coord.y_max.push_back(yMax);
             coord.z_min.push_back(zMin);
             coord.z_max.push_back(zMax);
-            // coord.x.push_back(object_x);
-            // coord.y.push_back(object_y);
-            // coord.z.push_back(object_z);
-            // coord.probability.push_back(object_iter->probability);
 
             object_index ++;
 
@@ -461,7 +460,7 @@ void RemoveBoxes()
 
 void callbackCmd(const std_msgs::String &msg)
 {
-    ROS_WARN("[callbackCmd] ");
+    ROS_INFO("[wpb_home_yolo_3d] 接收到 start 指令");
     int nFindIndex = 0;
     nFindIndex = msg.data.find("start");
     if( nFindIndex >= 0 )
@@ -474,9 +473,10 @@ void callbackCmd(const std_msgs::String &msg)
 
 int main(int argc, char **argv)
 {
+    setlocale(LC_ALL,"");
     ros::init(argc, argv, "wpb_home_yolo_3d");
     ros::NodeHandle nh_param("~");
-    ROS_WARN("wpb_home_yolo_3d");
+    ROS_WARN("[wpb_home_yolo_3d] 启动");
 
     nh_param.param<bool>("start", flag_predicted, false);
 
@@ -487,7 +487,7 @@ int main(int argc, char **argv)
     ros::Subscriber cmd_sub = nh.subscribe("/yolo/cmd", 1 , callbackCmd);
     ros::Subscriber yolo_sub = nh.subscribe("/yolo_bbox_2d", 1 , callbackBbox);
 
-    marker_pub = nh.advertise<visualization_msgs::Marker>("obj_marker", 1);
+    marker_pub = nh.advertise<visualization_msgs::Marker>("/obj_marker", 1);
     coord_pub = nh.advertise<wpb_yolo5::BBox3D>("/yolo/coord", 10);
     predict_pub = nh.advertise<sensor_msgs::Image>("/yolo/image_predict", 1);
 
