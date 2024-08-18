@@ -1,0 +1,15 @@
+<launch>
+
+  <!--- Run Kinect -->
+  <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
+
+  <node pkg="wpb_yolo5" type="yolo5_node.py" name="yolo5_node"/>
+
+  <node pkg="wpb_yolo5" type="wpb_home_yolo_3d" name="wpb_home_yolo_3d" output="screen">
+    <param name="start" type="bool" value="true"/> 
+  </node>
+
+  <arg name="rvizconfig" default="$(find wpb_yolo5)/rviz/yolo_3d.rviz" />
+  <node name="rviz" pkg="rviz" type="rviz" args="-d $(arg rvizconfig)" required="true" />
+
+</launch>
