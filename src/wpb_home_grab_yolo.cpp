@@ -53,9 +53,9 @@ void ObjCoordCB(const wpb_yolo5::BBox3D::ConstPtr &msg)
         ROS_WARN("[wpb_home_grab_yolo] 接收到结果数量 = %d",nNumObj);
         for(int i=0; i<nNumObj; i++)
         {
-            if(msg->name[i] == "water")
+            if(msg->name[i] == "sprite")
             {
-                grab_msg.position.x = (msg->x_min[i] + msg->x_min[i])/2;
+                grab_msg.position.x = (msg->x_min[i] + msg->x_min[i])/2+0.1;
                 grab_msg.position.y = (msg->y_min[i] + msg->y_min[i])/2;
                 grab_msg.position.z = (msg->z_min[i] + msg->z_min[i])/2;
                 grab_pub.publish(grab_msg);
@@ -87,7 +87,7 @@ int main(int argc, char** argv)
 
     std_msgs::String cmd_msg;
     cmd_msg.data = "start";
-
+    cmd_pub.publish(cmd_msg);
 
     ros::Rate r(30);
     while(ros::ok())

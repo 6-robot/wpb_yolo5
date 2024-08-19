@@ -280,16 +280,16 @@ void callbackPointCloud(const sensor_msgs::PointCloud2 &input)
             pcl::PointCloud<pcl::PointXYZRGB>::Ptr tbjects(new pcl::PointCloud<pcl::PointXYZRGB>);
             pass.setInputCloud (cloud_source_ptr);
             pass.setFilterFieldName ("z");
-            pass.setFilterLimits (plane_height+0.04, plane_height+0.3);
+            pass.setFilterLimits (plane_height-0.1, plane_height+0.1);
             pass.filter (*tbjects);
-
+            
             // 找平面上的物品
             pcl::search::KdTree<pcl::PointXYZRGB>::Ptr tree (new pcl::search::KdTree<pcl::PointXYZRGB>);
             pcl::EuclideanClusterExtraction<pcl::PointXYZRGB> ec;
             std::vector<pcl::PointIndices> cluster_indices;
-            ec.setClusterTolerance (0.04);
-            ec.setMinClusterSize (200);
-            ec.setMaxClusterSize (10000);
+            ec.setClusterTolerance (0.1);
+            ec.setMinClusterSize (1);
+            ec.setMaxClusterSize (5000);
             ec.setSearchMethod (tree);
             ec.setInputCloud (tbjects);
             ec.extract (cluster_indices);
@@ -352,6 +352,7 @@ void callbackPointCloud(const sensor_msgs::PointCloud2 &input)
             coord.y_max.push_back(yMax);
             coord.z_min.push_back(zMin);
             coord.z_max.push_back(zMax);
+
 
             object_index ++;
 

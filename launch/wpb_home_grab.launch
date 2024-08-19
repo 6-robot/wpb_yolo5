@@ -7,6 +7,10 @@
     <rosparam file="$(find wpb_home_bringup)/config/wpb_home.yaml" command="load" />
   </node>
 
+  <node name="joint_state_publisher" pkg="joint_state_publisher" type="joint_state_publisher" >
+    <rosparam command="load" file="$(find wpb_home_bringup)/config/wpb_home.yaml" />
+  </node>
+
   <!--- Run Kinect -->
   <include file="$(find kinect2_bridge)/launch/kinect2_bridge.launch" />
 
